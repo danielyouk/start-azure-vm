@@ -3,9 +3,9 @@ name: Monitor Trading Automation
 on:
   workflow_dispatch:
   schedule:
-    - cron: '30 22 * * 1-6'  # This is the time in UTC (9:20 AM in New York in the summer) --> should be set '20 14 * * 1-5' for the winter time (First Sunday in November to Second Sunday in March)
+    - cron: '45 22 * * 1-6'  # This is the time in UTC (9:20 AM in New York in the summer) --> should be set '20 14 * * 1-5' for the winter time (First Sunday in November to Second Sunday in March)
       # tz: 'America/New_York' # Timezone for New York -->unfortunately this feature has not been implemented though a lot of discussion has been going on in the GitHub community: https://github.com/orgs/community/discussions/13454
-    - cron: '35 22 * * 1-6'  # This is the time in UTC (4:10 PM in New York in the summer) --> should be set '10 21 * * 1-5' for the winter time (First Sunday in November to Second Sunday in March)
+    - cron: '55 22 * * 1-6'  # This is the time in UTC (4:10 PM in New York in the summer) --> should be set '10 21 * * 1-5' for the winter time (First Sunday in November to Second Sunday in March)
       # tz: 'America/New_York' # Timezone for New York 
 
 jobs:
