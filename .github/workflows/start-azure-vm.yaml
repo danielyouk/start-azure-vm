@@ -1,12 +1,10 @@
-name: Monitor Trading Automation
+name: Start Azure VM for Trading
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '52 22 * * 1-5'  # This is the time in UTC (9:20 AM in New York in the summer) --> should be set '20 14 * * 1-5' for the winter time (First Sunday in November to Second Sunday in March)
+    - cron: '20 13 * * 1-5'  # This is the time in UTC (9:20 AM in New York in the summer) --> should be set '20 14 * * 1-5' for the winter time (First Sunday in November to Second Sunday in March)
       tz: 'America/New_York' # Timezone for New York -->unfortunately this feature has not been implemented though a lot of discussion has been going on in the GitHub community: https://github.com/orgs/community/discussions/13454
-    - cron: '0 23 * * 1-5'  # This is the time in UTC (4:10 PM in New York in the summer) --> should be set '10 21 * * 1-5' for the winter time (First Sunday in November to Second Sunday in March)
-      tz: 'America/New_York' # Timezone for New York 
 
 jobs:
   start_vm:
@@ -41,67 +39,6 @@ jobs:
         run: |
           az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
 
-      # - name: Start Azure VM
-      #   if: env.IS_HOLIDAY == 'false'
-      #   run: az vm start --resource-group tws-dedicated-windows-vm_group --name tws-dedicated-windows-vm
-
-      # - name: Run Trading Automation Script
-      #   if: env.IS_HOLIDAY == 'false'
-      #   run: |
-      #     # Change to the root directory if needed
-      #     cd $GITHUB_WORKSPACE
-
-      #     # Execute your trading script or automation logic here
-      #     echo "Trading automation executed successfully on $(date)" >> automation_log.txt
-
-      # - name: Commit and Push Logs
-      #   if: env.IS_HOLIDAY == 'false'
-      #   run: |
-      #     # Set Git user name and email for the commit
-      #     git config --global user.name "github-actions[bot]"
-      #     git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          
-      #     # Change to the root directory if needed
-      #     cd $GITHUB_WORKSPACE
-          
-      #     # Add the log file to the repository
-      #     git add automation_log.txt
-          
-      #     # Commit the changes with a timestamped message
-      #     git commit -m "Trading automation log update on $(date '+%Y-%m-%d at %H:%M:%S')"
-          
-      #     # Push the commit to the repository using the PAT
-      #     git push https://danielyouk:${{ secrets.PAT_TOKEN }}@github.com/danielyouk/start-azure-vm.git
-
-  stop_vm:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pandas_market_calendars
-
-      - name: Check if Today is a Trading Day
-        run: |
-          python check_nyse_trading_day.py
-
-      - name: Login to Azure CLI
+      - name: Start Azure VM
         if: env.IS_HOLIDAY == 'false'
-        env:
-          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-        run: |
-          az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
-
-      - name: Stop Azure VM
-        if: env.IS_HOLIDAY == 'false'
-        run: az vm stop --resource-group tws-dedicated-windows-vm_group --name tws-dedicated-windows-vm
+        run: az vm start --resource-group tws-dedicated-windows-vm_group --name tws-dedicated-windows-vm
