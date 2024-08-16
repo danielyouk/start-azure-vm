@@ -26,12 +26,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install pandas_market_calendars
 
-      # - name: Check if Today is a Trading Day
-      #   run: |
-      #     python check_nyse_trading_day.py
+      - name: Check if Today is a Trading Day
+        run: |
+          python check_nyse_trading_day.py
 
       - name: Login to Azure CLI
-        # if: env.IS_HOLIDAY == 'false'
+        if: env.IS_HOLIDAY == 'false'
         env:
           AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
@@ -40,5 +40,5 @@ jobs:
           az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
 
       - name: Start Azure VM
-        # if: env.IS_HOLIDAY == 'false'
+        if: env.IS_HOLIDAY == 'false'
         run: az vm start --resource-group tws-dedicated-windows-vm_group --name tws-dedicated-windows-vm
