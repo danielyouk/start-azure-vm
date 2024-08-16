@@ -1,0 +1,44 @@
+name: Stop Azure VM for Trading
+
+on:
+  workflow_dispatch:
+  # schedule:
+    # - cron: '20 13 * * 1'  # This is the time in UTC (9:20 AM in New York in the summer) --> should be set '20 14 * * 1-5' for the winter time (First Sunday in November to Second Sunday in March)
+    #   tz: 'America/New_York' # Timezone for New York -->unfortunately this feature has not been implemented though a lot of discussion has been going on in the GitHub community: https://github.com/orgs/community/discussions/13454
+
+jobs:
+  stop_vm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Print current time
+        run: date
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas_market_calendars
+
+      - name: Check if Today is a Trading Day
+        run: |
+          python check_nyse_trading_day.py
+
+      - name: Login to Azure CLI
+        if: env.IS_HOLIDAY == 'false'
+        env:
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        run: |
+          az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+
+      - name: Stop Azure VM
+        if: env.IS_HOLIDAY == 'false'
+        run: az vm stop --resource-group tws-dedicated-windows-vm_group --name tws-dedicated-windows-vm
