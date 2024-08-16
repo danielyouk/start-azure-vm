@@ -1,13 +1,13 @@
-name: Start Azure VM for Trading
+name: Stop Azure VM for Trading
 
 on:
   workflow_dispatch:
   schedule:
-    # - cron: '20 13 * * 1'  # This is the time in UTC (9:20 AM in New York in the summer) --> should be set '20 14 * * 1-5' for the winter time (First Sunday in November to Second Sunday in March)
-    #   tz: 'America/New_York' # Timezone for New York -->unfortunately this feature has not been implemented though a lot of discussion has been going on in the GitHub community: https://github.com/orgs/community/discussions/13454
+    - cron: '10 20 * * 5'  # This is the time in UTC (9:20 AM in New York in the summer) --> should be set '20 14 * * 1-5' for the winter time (First Sunday in November to Second Sunday in March)
+      tz: 'America/New_York' # Timezone for New York -->unfortunately this feature has not been implemented though a lot of discussion has been going on in the GitHub community: https://github.com/orgs/community/discussions/13454
 
 jobs:
-  start_vm:
+  stop_vm:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -39,6 +39,6 @@ jobs:
         run: |
           az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
 
-      - name: Start Azure VM
+      - name: stop Azure VM
         # if: env.IS_HOLIDAY == 'false'
-        run: az vm start --resource-group tws-dedicated-windows-vm_group --name tws-dedicated-windows-vm
+        run: az vm stop --resource-group tws-dedicated-windows-vm_group --name tws-dedicated-windows-vm
